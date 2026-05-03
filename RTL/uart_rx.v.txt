@@ -1,0 +1,79 @@
+module uart_rx (
+    input  wire       clk,
+    input  wire       reset,
+    input  wire       tick,
+    input  wire       rx,
+    output reg [7:0]  data_out,
+    output reg        done
+);
+
+    // FSM states
+    localparam IDLE  = 2'd0,
+               START = 2'd1,
+               DATA  = 2'd2,
+               STOP  = 2'd3;
+
+    reg [1:0] state;
+    reg [3:0] bit_cnt;
+    reg [7:0] data;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state    <= IDLE;
+            bit_cnt  <= 0;
+            data     <= 0;
+            data_out <= 0;
+            done     <= 0;
+        end 
+        else begin
+            case (state)
+
+                //----------------------------------
+                // IDLE
+                //----------------------------------
+              IDLE: begin
+    done <= 0;   // reset done here
+
+    if (rx == 0)
+        state <= START;
+end
+                //----------------------------------
+                // START
+                //----------------------------------
+                START: begin
+                    if (tick) begin
+                        // move to data sampling
+                        bit_cnt <= 0;
+                        state   <= DATA;
+                    end
+                end
+
+                //----------------------------------
+                // DATA (8 bits)
+                //----------------------------------
+                DATA: begin
+                    if (tick) begin
+                        data[bit_cnt] <= rx;
+                        bit_cnt <= bit_cnt + 1;
+
+                        if (bit_cnt == 7)
+                            state <= STOP;
+                    end
+                end
+
+                //----------------------------------
+                // STOP
+                //----------------------------------
+               STOP: begin
+    if (tick) begin
+        data_out <= data;
+        done <= 1;
+        state <= IDLE;
+    end
+end
+
+            endcase
+        end
+    end
+
+endmodule

@@ -1,0 +1,48 @@
+`timescale 1ns/1ps
+
+module tb_uart;
+
+    reg clk;
+    reg reset;
+    reg start;
+    reg [7:0] data_in;
+
+    wire tx;
+    wire [7:0] data_out;
+    wire done;
+
+    uart_top uut (
+        .clk(clk),
+        .reset(reset),
+        .start(start),
+        .data_in(data_in),
+        .tx(tx),
+        .data_out(data_out),
+        .done(done)
+    );
+
+    // Clock
+    always #5 clk = ~clk;
+
+    initial begin
+        clk = 0;
+        reset = 1;
+        start = 0;
+        data_in = 8'hAA;
+
+        #20;
+        reset = 0;
+
+        #100;
+
+        // 🔥 IMPORTANT: visible start pulse
+        start = 1;
+        #100000;
+        start = 0;
+
+        #500000;
+
+        $finish;
+    end
+
+endmodule

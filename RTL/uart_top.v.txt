@@ -1,0 +1,42 @@
+module uart_top (
+    input  wire       clk,
+    input  wire       reset,
+    input  wire       start,
+    input  wire [7:0] data_in,
+    output wire       tx,
+    output wire [7:0] data_out,
+    output wire       done
+);
+
+    wire tick;
+    wire busy;
+
+    // Baud Generator
+    baud_gen bg (
+        .clk(clk),
+        .reset(reset),
+        .tick(tick)
+    );
+
+    // UART Transmitter
+    uart_tx tx_inst (
+        .clk(clk),
+        .reset(reset),
+        .tick(tick),
+        .start(start),
+        .data_in(data_in),
+        .tx(tx),
+        .busy(busy)
+    );
+
+    // UART Receiver (loopback)
+    uart_rx rx_inst (
+        .clk(clk),
+        .reset(reset),
+        .tick(tick),
+        .rx(tx),
+        .data_out(data_out),
+        .done(done)
+    );
+
+endmodule
