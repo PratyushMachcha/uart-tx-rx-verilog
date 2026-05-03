@@ -83,7 +83,7 @@ Syn/ → Synthesis reports
 
 The UART system is verified using a testbench that transmits and receives data.
 
-👉 Add waveform here:
+
 <img width="1920" height="931" alt="System overview" src="https://github.com/user-attachments/assets/e38e3e82-a346-400e-a373-5092c0a5b824" />
 
 ```text
